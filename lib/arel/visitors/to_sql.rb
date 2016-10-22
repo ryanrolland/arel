@@ -73,9 +73,9 @@ module Arel
 
       def visit_Arel_Nodes_SelectStatement o
         [
+          (visit(o.limit) if o.limit),
           o.cores.map { |x| visit_Arel_Nodes_SelectCore x }.join,
           ("ORDER BY #{o.orders.map { |x| visit x }.join(', ')}" unless o.orders.empty?),
-          (visit(o.limit) if o.limit),
           (visit(o.offset) if o.offset),
           (visit(o.lock) if o.lock),
         ].compact.join ' '
@@ -102,7 +102,7 @@ module Arel
       end
 
       def visit_Arel_Nodes_Limit o
-        "LIMIT #{visit o.expr}"
+        "TOP #{visit o.expr}"
       end
 
       # FIXME: this does nothing on most databases, but does on MSSQL
