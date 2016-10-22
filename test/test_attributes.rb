@@ -1,4 +1,5 @@
-require 'helper'
+#require 'helper'
+require File.dirname(__FILE__) + '/helper'
 
 module Arel
   describe 'Attributes' do

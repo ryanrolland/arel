@@ -1,10 +1,11 @@
-require 'helper'
+require File.dirname(__FILE__) + '/helper'
 
 module Arel
   describe Table do
     before do
       @relation = Table.new(:users)
     end
+
 
     describe 'skip' do
       it 'should add an offset' do

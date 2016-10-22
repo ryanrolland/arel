@@ -1,4 +1,4 @@
-require 'helper'
+require File.dirname(__FILE__) + '/helper'
 
 module Arel
   class EngineProxy
@@ -46,6 +46,17 @@ module Arel
           manager.to_sql.must_be_like %{
             SELECT id FROM "users"
           }
+        end
+      end
+
+      describe 'limit' do
+        it 'accepts symbols' do
+          table   = Table.new :users
+          manager = Arel::SelectManager.new Table.engine
+          manager.project SqlLiteral.new '*'
+          manager.from table
+          manager.take(1)
+          manager.to_sql.must_be_like %{TOP 1 SELECT * FROM "users" }
         end
       end
 
@@ -458,7 +469,7 @@ module Arel
 
         engine.executed.last.must_be_like %{
           UPDATE "users" SET foo = bar
-          WHERE "users"."id" IN (SELECT "users"."id" FROM "users" LIMIT 1)
+          WHERE "users"."id" IN (TOP 1 SELECT "users"."id" FROM "users")
         }
       end
 
@@ -544,10 +555,10 @@ module Arel
         manager.take 1
 
         manager.to_sql.must_be_like %{
+          TOP 1
           SELECT "users"."id"
           FROM "users"
           WHERE "users"."id" = 1
-          LIMIT 1
         }
       end
 
