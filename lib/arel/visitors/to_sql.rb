@@ -73,18 +73,17 @@ module Arel
 
       def visit_Arel_Nodes_SelectStatement o
         [
-          (visit(o.limit) if o.limit),
-          o.cores.map { |x| visit_Arel_Nodes_SelectCore x }.join,
+          o.cores.map { |x| visit_Arel_Nodes_SelectCore(x,o.limit) }.join,
           ("ORDER BY #{o.orders.map { |x| visit x }.join(', ')}" unless o.orders.empty?),
           (visit(o.offset) if o.offset),
           (visit(o.lock) if o.lock),
         ].compact.join ' '
       end
 
-      def visit_Arel_Nodes_SelectCore o
+      def visit_Arel_Nodes_SelectCore(o, limit=nil)
         [
           "SELECT",
-          (visit(o.top) if o.top),
+          (visit(limit) if limit),
           "#{o.projections.map { |x| visit x }.join ', '}",
           ("FROM #{visit o.froms}" if o.froms),
           ("WHERE #{o.wheres.map { |x| visit x }.join ' AND ' }" unless o.wheres.empty?),
@@ -102,12 +101,13 @@ module Arel
       end
 
       def visit_Arel_Nodes_Limit o
-        "TOP #{visit o.expr}"
+        " TOP #{visit o.expr}"
       end
 
       # FIXME: this does nothing on most databases, but does on MSSQL
+      # This library was modified to work with MSSQL. Limit method (above) was changed to handle TOP
       def visit_Arel_Nodes_Top o
-        ""
+        "TOP SHOULD BE CALLED VIA ABOVE LIMIT METHOD"
       end
 
       # FIXME: this does nothing on SQLLite3, but should do things on other

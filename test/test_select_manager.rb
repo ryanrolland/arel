@@ -56,7 +56,7 @@ module Arel
           manager.project SqlLiteral.new '*'
           manager.from table
           manager.take(1)
-          manager.to_sql.must_be_like %{TOP 1 SELECT * FROM "users" }
+          manager.to_sql.must_be_like %{SELECT TOP 1 * FROM "users" }
         end
       end
 
@@ -469,7 +469,7 @@ module Arel
 
         engine.executed.last.must_be_like %{
           UPDATE "users" SET foo = bar
-          WHERE "users"."id" IN (TOP 1 SELECT "users"."id" FROM "users")
+          WHERE "users"."id" IN (SELECT TOP 1 "users"."id" FROM "users")
         }
       end
 
@@ -555,8 +555,7 @@ module Arel
         manager.take 1
 
         manager.to_sql.must_be_like %{
-          TOP 1
-          SELECT "users"."id"
+          SELECT TOP 1 "users"."id"
           FROM "users"
           WHERE "users"."id" = 1
         }
